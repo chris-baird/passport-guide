@@ -60,7 +60,9 @@ class SignupForm extends Component {
                 <div>...{errors.password}...</div>
               )} */}
 
-              <button type="submit">Submit</button>
+              <button className="btn btn-info" type="submit">
+                Submit
+              </button>
             </Form>
           )}
         </Formik>
