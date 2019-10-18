@@ -10,7 +10,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loggedIn: false
+      loggedIn: false,
+      message: ''
     };
     this.handleLogIn = this.handleLogIn.bind(this);
     this.handleSignUp = this.handleSignUp.bind(this);
@@ -32,9 +33,10 @@ class App extends React.Component {
         if (res.data) {
           this.setState({ loggedIn: true });
         }
+        if (!res.data) this.setState({ message: 'Invalid email or password' });
       })
       .catch(err => {
-        if (err) console.log('Invalid email or password');
+        if (err) this.setState({ message: 'Invalid email or password' });
       });
   }
 
@@ -77,7 +79,10 @@ class App extends React.Component {
         ) : (
           <div>
             <p>Sign In</p>
-            <LoginForm handleLogIn={this.handleLogIn} />
+            <LoginForm
+              handleLogIn={this.handleLogIn}
+              message={this.state.message}
+            />
             <p>Sign Up</p>
             <SignupForm handleSignUp={this.handleSignUp} />
           </div>
