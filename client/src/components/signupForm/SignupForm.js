@@ -13,12 +13,22 @@ const SignupSchema = Yup.object().shape({
     .required('Password Is Required')
 });
 
+const checkEmailUsed = email => {
+  return axios
+    .get(`/api/email/availability/${email}`)
+    .then(res => {
+      if (res.data) throw 'Email Is Taken';
+    })
+    .catch(err => console.log(err));
+};
+
 class SignupForm extends Component {
   render() {
     return (
       <div>
         <h1>Signup</h1>
         <Formik
+          validateOnChange={false}
           validateOnBlur={true}
           initialValues={{
             email: '',
@@ -26,19 +36,21 @@ class SignupForm extends Component {
           }}
           validationSchema={SignupSchema}
           onSubmit={(values, formikBag) => {
-            axios.get(`/api/email/availability/${values.email}`).then(res => {
-              if (!res.data) {
+            axios
+              .post('/api/signup', {
+                email: values.email,
+                password: values.password
+              })
+              .then(res => {
                 formikBag.resetForm();
-              } else {
-                formikBag.setFieldError('email', 'Email is already taken');
-              }
-            });
+              })
+              .catch(err => console.log(err));
           }}
         >
-          {({ errors, touched }) => (
+          {() => (
             <Form className="form-block">
               <div className="form-group">
-                <Field name="email" type="text" />
+                <Field name="email" type="text" validate={checkEmailUsed} />
                 <ErrorMessage
                   name="email"
                   component="small"
@@ -54,12 +66,6 @@ class SignupForm extends Component {
                   className="form-text text-muted"
                 />
               </div>
-              {/* {errors.email && touched.email && <div>...{errors.email}...</div>} */}
-
-              {/* {errors.password && touched.password && (
-                <div>...{errors.password}...</div>
-              )} */}
-
               <button className="btn btn-info" type="submit">
                 Submit
               </button>
@@ -70,54 +76,5 @@ class SignupForm extends Component {
     );
   }
 }
-
-// class SignupForm extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = { email: '', password: '' };
-//     this.handleChange = this.handleChange.bind(this);
-//   }
-
-//   handleChange(event) {
-//     const target = event.target;
-//     const value = target.type === 'checkbox' ? target.checked : target.value;
-//     const name = target.name;
-//     this.setState({
-//       [name]: value
-//     });
-//   }
-
-//   render() {
-//     return (
-//       <div>
-//         <h1>Sign Up</h1>
-//         <form action="">
-//           <label htmlFor="">Email</label>
-//           <input
-//             name="email"
-//             type="text"
-//             value={this.state.email}
-//             onChange={this.handleChange}
-//           />
-//           <label htmlFor="">Password</label>
-//           <input
-//             name="password"
-//             type="password"
-//             value={this.state.password}
-//             onChange={this.handleChange}
-//           />
-//         </form>
-//         <button
-//           value="submit"
-//           onClick={() =>
-//             this.props.handleSignUp(this.state.email, this.state.password)
-//           }
-//         >
-//           Sign Up
-//         </button>
-//       </div>
-//     );
-//   }
-// }
 
 export default SignupForm;
