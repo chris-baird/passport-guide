@@ -42,15 +42,10 @@ module.exports = function(app) {
       password: req.body.password
     })
       .then(function() {
-        res.redirect(307, '/api/login');
+        res.json(false);
       })
       .catch(function(err) {
-        console.log(
-          '+++++++++++++++++++++++++ERROR HIT++++++++++++++++++++++++++++'
-        );
-        console.log(err);
-        res.json(err);
-        // res.status(422).json(err.errors[0].message);
+        res.json(true);
       });
   });
   //
@@ -81,7 +76,6 @@ module.exports = function(app) {
 
   // Email check
   app.get('/api/email/availability/:email', (req, res) => {
-    console.log(req.params.email);
     db.User.findOne({ where: { email: req.params.email } }).then(user => {
       !user ? res.json(false) : res.json(true);
     });
